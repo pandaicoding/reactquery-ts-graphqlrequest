@@ -1,5 +1,5 @@
 import { GraphQLClient } from 'graphql-request';
-import { useQuery, UseQueryOptions } from 'react-query';
+import { useMutation, UseMutationOptions, useQuery, UseQueryOptions } from 'react-query';
 
 export type Maybe<T> = T | null;
 export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
@@ -80,6 +80,20 @@ export type Query = {
   authors?: Maybe<Array<Maybe<Author>>>;
 };
 
+export type CreateAuthorMutationVariables = Exact<{
+  input?: Maybe<CreateAuthorInput>;
+}>;
+
+export type CreateAuthorMutation = { __typename?: 'Mutation' } & {
+  createAuthor?: Maybe<{ __typename?: 'Author' } & Pick<Author, 'authorId' | 'username'>>;
+};
+
+export type GetAllAuthorsQueryVariables = Exact<{ [key: string]: never }>;
+
+export type GetAllAuthorsQuery = { __typename?: 'Query' } & {
+  authors?: Maybe<Array<Maybe<{ __typename?: 'Author' } & Pick<Author, 'authorId' | 'username'>>>>;
+};
+
 export type GetAllBooksQueryVariables = Exact<{ [key: string]: never }>;
 
 export type GetAllBooksQuery = { __typename?: 'Query' } & {
@@ -94,6 +108,43 @@ export type GetAllBooksQuery = { __typename?: 'Query' } & {
   >;
 };
 
+export const CreateAuthorDocument = `
+    mutation CreateAuthor($input: CreateAuthorInput) {
+  createAuthor(input: $input) {
+    authorId
+    username
+  }
+}
+    `;
+// eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
+export const useCreateAuthorMutation = <TError = unknown, TContext = unknown>(
+  client: GraphQLClient,
+  options?: UseMutationOptions<CreateAuthorMutation, TError, CreateAuthorMutationVariables, TContext>
+) =>
+  useMutation<CreateAuthorMutation, TError, CreateAuthorMutationVariables, TContext>(
+    (variables?: CreateAuthorMutationVariables) =>
+      fetcher<CreateAuthorMutation, CreateAuthorMutationVariables>(client, CreateAuthorDocument, variables)(),
+    options
+  );
+export const GetAllAuthorsDocument = `
+    query GetAllAuthors {
+  authors {
+    authorId
+    username
+  }
+}
+    `;
+// eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
+export const useGetAllAuthorsQuery = <TData = GetAllAuthorsQuery, TError = unknown>(
+  client: GraphQLClient,
+  variables?: GetAllAuthorsQueryVariables,
+  options?: UseQueryOptions<GetAllAuthorsQuery, TError, TData>
+) =>
+  useQuery<GetAllAuthorsQuery, TError, TData>(
+    ['GetAllAuthors', variables],
+    fetcher<GetAllAuthorsQuery, GetAllAuthorsQueryVariables>(client, GetAllAuthorsDocument, variables),
+    options
+  );
 export const GetAllBooksDocument = `
     query GetAllBooks {
   books {
